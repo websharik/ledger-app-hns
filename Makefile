@@ -30,9 +30,9 @@ SDK_SOURCE_PATH += lib_blewbxx lib_blewbxx_impl lib_ux
 ICONNAME = nanox_icon_hns.gif
 endif
 
-# Ledger maintainers put these here.
-# APP_LOAD_PARAMS += --tlvraw 9F:01
-# DEFINES += HAVE_PENDING_REVIEW_SCREEN
+# Pending security review
+APP_LOAD_PARAMS += --tlvraw 9F:01
+DEFINES += HAVE_PENDING_REVIEW_SCREEN
 
 #
 # Platform
