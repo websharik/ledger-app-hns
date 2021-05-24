@@ -127,7 +127,6 @@ typedef struct hns_redeem_s {
 typedef struct hns_register_s {
   uint8_t name_hash[32];
   uint8_t height[4];
-  hns_varint_t resource_len;
   hns_varint_t resource_ctr;
   uint8_t hash[32];
 } hns_register_t;
@@ -135,7 +134,6 @@ typedef struct hns_register_s {
 typedef struct hns_update_s {
   uint8_t name_hash[32];
   uint8_t height[4];
-  hns_varint_t resource_len;
   hns_varint_t resource_ctr;
 } hns_update_t;
 
@@ -297,11 +295,11 @@ hns_apdu_get_app_version(
  * @return the status word
  */
 
-uint8_t
+uint16_t
 hns_apdu_get_public_key(
   uint8_t p1,
   uint8_t p2,
-  uint8_t len,
+  uint16_t len,
   volatile uint8_t *in,
   volatile uint8_t *out,
   volatile uint8_t *flags
@@ -322,11 +320,11 @@ hns_apdu_get_public_key(
  * @return the status word
  */
 
-uint8_t
+uint16_t
 hns_apdu_get_input_signature(
   uint8_t p1,
   uint8_t p2,
-  uint8_t len,
+  uint16_t len,
   volatile uint8_t *in,
   volatile uint8_t *out,
   volatile uint8_t *flags

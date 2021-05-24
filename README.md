@@ -1,7 +1,7 @@
 # ledger-app-hns
 
-This is a key management application for the Handshake Protocol. It runs on
-the Ledger Nano S personal security device and allows users to create extended
+This is a key management application for the Handshake Protocol. With support
+for both the Ledger Nano S and Ledger Nano X, it allows users to create extended
 public keys, addresses, and signatures for valid Handshake transactions. It
 can be used with the [hsd-ledger][hsd-ledger] client library to interact with
 wallet software.
@@ -85,6 +85,16 @@ $ docker run --rm --privileged ledger-app-hns-build make load
 
 - Follow the terminal and on-device instructions (this process takes a while).
 
+##### Nano X
+
+If you are using a Nano X, run:
+
+```bash
+$ docker build --build-arg GIT_NAME="nanox-secure-sdk" --build-arg GIT_REF="1.2.4-5.1" \
+               --build-arg CACHE_BUST="$(date)" -f Dockerfile.build -t ledger-app-hns-build .
+$ docker run --rm --privileged ledger-app-hns-build make load
+```
+
 <br/>
 
 ### macOS or Windows Host
@@ -124,9 +134,9 @@ Clone the git repo:
 $ git clone https://github.com/ledgerhq/nanos-secure-sdk.git
 ```
 
-If your device is running firmware v1.6.0 checkout the `og-1.6.0-1` branch:
+If your device is running firmware v1.6.0 checkout the `nanos-1612` branch:
 ```bash
-$ git checkout og-1.6.0-1
+$ git checkout nanos-1612
 ```
 
 If your device is running firmware v1.5.5 checkout the `nanos-1553` branch:
@@ -191,6 +201,39 @@ $ GIT_REF="nanos-1553" make docker-load
 [firmware]: https://support.ledger.com/hc/en-us/articles/360002997193-Check-the-firmware-version
 
 <br/>
+
+## Build Apps Only (for emulator)
+
+To build both Nano S and Nano X apps using Docker:
+
+```bash
+$ make docker-build-all
+```
+
+This will run the build in a docker container and copy the final builds to
+`/bin/hns-nanos.elf` and `/bin/hns-nanox.elf`
+
+These two binaries can be executed inside the
+[Speculos emulator](https://github.com/LedgerHQ/speculos).
+For example, to run the built Nano S app in the emulator from docker:
+
+```
+docker run -v \
+  /path/to/ledger-app-hns/bin:/speculos/apps \
+  --publish 5900:5900 \
+  -it \
+  ledgerhq/speculos \
+  --display headless \
+  --vnc-port 5900 \
+  --vnc-password=xyz \
+  apps/hns-nanos.elf \
+  --model nanos
+```
+
+The command is explained in detail in the Speculos docs. Just note the path
+to the `/bin` directory and `model` argument. The emulated device can be
+accessed using a VNC client. On OSX, the `--vnc-password` argument is required
+and will be requested by the VNC client.
 
 ## Tests
 

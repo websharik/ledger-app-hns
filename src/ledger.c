@@ -52,10 +52,19 @@ ledger_init(void) {
 
   io_seproxyhal_init();
 
+#ifdef TARGET_NANOX
+  G_io_app.plane_mode = os_setting_get(OS_SETTING_PLANEMODE, NULL, 0);
+#endif
+
   USB_power(false);
   USB_power(true);
 
   ledger_ui_init();
+
+#ifdef HAVE_BLE
+  BLE_power(0, NULL);
+  BLE_power(1, "Nano X");
+#endif
 
   return G_io_apdu_buffer;
 }
@@ -81,9 +90,9 @@ ledger_exit(uint32_t code) {
   END_TRY_L(exit);
 }
 
-uint32_t
+bool
 ledger_unlocked(void) {
-  return os_global_pin_is_validated();
+  return os_global_pin_is_validated() == BOLOS_UX_OK;
 }
 
 void
@@ -110,11 +119,11 @@ ledger_apdu_cache_write(volatile uint8_t *src, uint8_t src_len) {
 }
 
 uint8_t
-ledger_apdu_cache_flush(uint8_t *len) {
+ledger_apdu_cache_flush(uint16_t *len) {
   uint8_t *cache = g_ledger_apdu_cache;
   uint8_t *buffer = g_ledger_apdu_buffer;
   uint8_t cache_len = g_ledger_apdu_cache_len;
-  uint8_t buffer_len = 0;
+  uint16_t buffer_len = 0;
 
   if (cache_len == 0)
     return 0;
@@ -448,7 +457,13 @@ ledger_sha3(const void *data, size_t data_sz, void *digest) {
  */
 
 uint8_t G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
+
+#if defined(HAVE_UX_FLOW)
+ux_state_t G_ux;
+bolos_ux_params_t G_ux_params;
+#else
 ux_state_t ux;
+#endif
 
 /**
  * BOLOS SDK function definitions.
@@ -527,5 +542,6 @@ io_exchange_al(uint8_t channel, uint16_t tx_len) {
 
 void
 io_seproxyhal_display(const bagl_element_t *element) {
-  io_seproxyhal_display_default((bagl_element_t *)element);
+  if ((element->component.type & ~BAGL_TYPE_FLAGS_MASK) != BAGL_NONE)
+    io_seproxyhal_display_default((bagl_element_t *)element);
 }

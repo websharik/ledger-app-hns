@@ -158,7 +158,7 @@ static ledger_blake2b_ctx blake2;
 static inline bool
 parse_item(
   volatile uint8_t **buf,
-  uint8_t *len,
+  uint16_t *len,
   uint8_t *item,
   size_t item_sz,
   ledger_blake2b_ctx *hash
@@ -193,7 +193,7 @@ parse_item(
 static inline bool
 parse_addr(
   volatile uint8_t **buf,
-  uint8_t *len,
+  uint16_t *len,
   uint8_t *addr_hash,
   uint8_t *addr_len,
   ledger_blake2b_ctx *hash
@@ -228,7 +228,7 @@ parse_addr(
 static inline bool
 parse_name(
   volatile uint8_t **buf,
-  uint8_t *len,
+  uint16_t *len,
   char *name,
   uint8_t *name_len,
   ledger_blake2b_ctx *hash
@@ -257,7 +257,7 @@ parse_name(
  * covenant items list.
  *
  * In:
- * @param name_hash is the blake2b hash of the name.
+ * @param name_hash is the sha3 hash of the name.
  *
  * Out:
  * @param buf is the input buffer.
@@ -269,16 +269,16 @@ parse_name(
 static inline bool
 cmp_name(
   volatile uint8_t **buf,
-  uint8_t *len,
+  uint16_t *len,
   uint8_t *name_hash,
   char *name,
   uint8_t *name_len
 ) {
   uint8_t n[64];
-  uint8_t nlen;
+  size_t nlen;
   uint8_t digest[32];
 
-  if (!read_varbytes(buf, len, n, 63, (size_t *)&nlen))
+  if (!read_varbytes(buf, len, n, 63, &nlen))
     return false;
 
   if (nlen < 1 || nlen > 63)
@@ -313,7 +313,7 @@ cmp_name(
 static inline bool
 parse_resource_len(
   volatile uint8_t **buf,
-  uint8_t *len,
+  uint16_t *len,
   hns_varint_t *ctr,
   ledger_blake2b_ctx *hash
 ) {
@@ -346,7 +346,7 @@ parse_resource_len(
 static inline bool
 parse_resource(
   volatile uint8_t **buf,
-  uint8_t *len,
+  uint16_t *len,
   hns_varint_t *ctr,
   ledger_blake2b_ctx *hash
 ) {
@@ -365,6 +365,7 @@ parse_resource(
     if (*ctr > 0) {
       if (*len != 0)
         THROW(HNS_INCORRECT_PARSER_STATE);
+
       return false;
     }
   }
@@ -391,7 +392,7 @@ parse_resource(
 static inline uint8_t
 parse(
   uint8_t p1,
-  uint8_t *len,
+  uint16_t *len,
   volatile uint8_t *buf,
   volatile uint8_t *res,
   volatile uint8_t *flags
@@ -987,7 +988,7 @@ inner_break:
 static inline uint8_t
 sign(
   uint8_t p1,
-  uint8_t *len,
+  uint16_t *len,
   volatile uint8_t *buf,
   volatile uint8_t *sig,
   volatile uint8_t *flags
@@ -1170,7 +1171,6 @@ sign(
 
   sig[64] = *type;
 
-#if defined(TARGET_NANOS)
 
   /**
    * Confirm the fees iff this is the first SIGHASH_ALL signed input.
@@ -1201,9 +1201,9 @@ sign(
    */
 
   if (*type != SIGHASH_ALL) {
+    static const char types[5][14] = {"", "ALL", "NONE", "SINGLE", "SINGLEREVERSE"};
     char *hdr = "Sighash Type";
     char *msg = ui->message;
-    const char types[5][14] = {"", "ALL", "NONE", "SINGLE", "SINGLEREVERSE"};
     uint8_t low = *type & 0x1f;
     uint8_t high = *type & 0xf0;
 
@@ -1236,16 +1236,15 @@ sign(
 
     return 0;
   }
-#endif
 
   return 65;
 }
 
-uint8_t
+uint16_t
 hns_apdu_get_input_signature(
   uint8_t p1,
   uint8_t p2,
-  uint8_t len,
+  uint16_t len,
   volatile uint8_t *in,
   volatile uint8_t *out,
   volatile uint8_t *flags
