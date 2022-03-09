@@ -52,7 +52,7 @@ ledger_init(void) {
 
   io_seproxyhal_init();
 
-#ifdef TARGET_NANOX
+#ifdef HAVE_BLE
   G_io_app.plane_mode = os_setting_get(OS_SETTING_PLANEMODE, NULL, 0);
 #endif
 

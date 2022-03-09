@@ -17,17 +17,20 @@ PATCH = 5
 #
 
 APPNAME = "Handshake"
+ifeq ($(TARGET_NAME),TARGET_NANOS)
 ICONNAME = nanos_icon_hns.gif
+else
+ICONNAME = nanox_icon_hns.gif
+endif
 APPVERSION = $(MAJOR).$(MINOR).$(PATCH)
 
 APP_LOAD_PARAMS = --appFlags 0xa50 --path "" --curve secp256k1 \
                   $(COMMON_LOAD_PARAMS)
 APP_SOURCE_PATH = src vendor/bech32 vendor/base58
-SDK_SOURCE_PATH = lib_stusb lib_stusb_impl lib_u2f qrcode
+SDK_SOURCE_PATH = lib_stusb lib_stusb_impl lib_u2f lib_ux qrcode
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)
-SDK_SOURCE_PATH += lib_blewbxx lib_blewbxx_impl lib_ux
-ICONNAME = nanox_icon_hns.gif
+SDK_SOURCE_PATH += lib_blewbxx lib_blewbxx_impl
 endif
 
 # Pending security review
@@ -62,6 +65,9 @@ DEFINES += HAVE_WEBUSB WEBUSB_URL_SIZE_B=0 WEBUSB_URL=""
 ifeq ($(TARGET_NAME),TARGET_NANOX)
 DEFINES += HAVE_BLE BLE_COMMAND_TIMEOUT_MS=2000
 DEFINES += HAVE_BLE_APDU
+endif
+
+ifneq ($(TARGET_NAME),TARGET_NANOS)
 DEFINES += HAVE_UX_FLOW
 
 DEFINES += HAVE_GLO096
@@ -90,10 +96,10 @@ endif
 
 DEBUG := 0
 ifneq ($(DEBUG),0)
-ifeq ($(TARGET_NAME),TARGET_NANOX)
-DEFINES += HAVE_PRINTF PRINTF=mcu_usb_printf
-else
+ifeq ($(TARGET_NAME),TARGET_NANOS)
 DEFINES += HAVE_PRINTF PRINTF=screen_printf
+else
+DEFINES += HAVE_PRINTF PRINTF=mcu_usb_printf
 endif
 else
 DEFINES += PRINTF\(...\)=
