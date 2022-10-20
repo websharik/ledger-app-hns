@@ -30,7 +30,7 @@ Once installation is complete, install the [client library][hsd-ledger].
 >Note: macOS and Windows are not supported. If you are _not_ running Linux,
 please follow the Docker instructions below.
 
-[setup]: https://developers.ledger.com/docs/nano-app/start-here/
+[setup]: https://developers.ledger.com/docs/nano-app/load/
 
 <br/>
 
