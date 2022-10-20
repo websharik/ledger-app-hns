@@ -30,7 +30,7 @@ Once installation is complete, install the [client library][hsd-ledger].
 >Note: macOS and Windows are not supported. If you are _not_ running Linux,
 please follow the Docker instructions below.
 
-[setup]: https://ledger.readthedocs.io/en/latest/userspace/getting_started.html
+[setup]: https://developers.ledger.com/docs/nano-app/start-here/
 
 <br/>
 
@@ -580,7 +580,7 @@ and [ledger-app-eth-dockerized][docker].
 See LICENSE for more info.
 
 [hsd-ledger]: https://github.com/handshake-org/hsd-ledger
-[ledger]: https://ledger.readhthedocs.io/en/latest/index.html
+[ledger]: https://developers.ledger.com/
 [apdu]: https://en.wikipedia.org/wiki/Smart_card_application_protocol_data_unit
 [sia]: https://gitlab.com/nebulouslabs/nanos-app-sia
 [btc]: https://github.com/ledgerhq/ledger-app-btc
