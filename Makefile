@@ -10,7 +10,7 @@ include $(BOLOS_SDK)/Makefile.defines
 
 MAJOR = 1
 MINOR = 0
-PATCH = 5
+PATCH = 6
 
 #
 # App
