@@ -133,10 +133,10 @@ all: default
 include $(BOLOS_SDK)/Makefile.glyphs
 
 load: all
-	python -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
+	python3 -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
 
 delete:
-	python -m ledgerblue.deleteApp $(COMMON_DELETE_PARAMS)
+	python3 -m ledgerblue.deleteApp $(COMMON_DELETE_PARAMS)
 
 include $(BOLOS_SDK)/Makefile.rules
 
@@ -145,47 +145,4 @@ dep/%.d: %.c Makefile
 listvariants:
 	@echo VARIANTS COIN hns
 
-#
-# Docker Rules
-#
-
-ifeq ($(GIT_NAME),)
-GIT_NAME := nanos-secure-sdk
-endif
-
-ifeq ($(GIT_REF),)
-GIT_REF := nanos-1612
-endif
-
-DOCKER_ARGS = --build-arg GIT_NAME='$(GIT_NAME)'     \
-              --build-arg GIT_REF='$(GIT_REF)'       \
-              --build-arg CACHE_BUST='$(shell date)'
-
-docker:
-	docker build $(DOCKER_ARGS) -f Dockerfile.build -t ledger-app-hns-build .
-	docker run --name ledger-app-hns-build ledger-app-hns-build
-	docker cp ledger-app-hns-build:/ledger-app-hns/bin/app.elf ./bin
-	docker cp ledger-app-hns-build:/ledger-app-hns/bin/app.hex ./bin
-	docker cp ledger-app-hns-build:/ledger-app-hns/debug/app.map ./debug
-	docker cp ledger-app-hns-build:/ledger-app-hns/debug/app.asm ./debug
-	docker rm ledger-app-hns-build
-
-docker-load: docker
-	python -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
-
-docker-build-all:
-	docker build -f Dockerfile.build-all -t ledger-app-hns-build-all . --progress=plain
-	docker run --name ledger-app-hns-build-all ledger-app-hns-build-all
-	docker cp ledger-app-hns-build-all:/nanos/bin/app.elf ./bin/hns-nanos.elf
-	docker cp ledger-app-hns-build-all:/nanos/bin/app.hex ./bin/hns-nanos.hex
-	docker cp ledger-app-hns-build-all:/nanos/debug/app.map ./debug/hns-nanos.map
-	docker cp ledger-app-hns-build-all:/nanos/debug/app.asm ./debug/hns-nanos.asm
-	docker cp ledger-app-hns-build-all:/nanox/bin/app.elf ./bin/hns-nanox.elf
-	docker cp ledger-app-hns-build-all:/nanox/bin/app.hex ./bin/hns-nanox.hex
-	docker cp ledger-app-hns-build-all:/nanox/debug/app.map ./debug/hns-nanox.map
-	docker cp ledger-app-hns-build-all:/nanox/debug/app.asm ./debug/hns-nanox.asm
-	docker rm ledger-app-hns-build-all
-
-MAKECMDGOALS := docker docker-load
-
-.PHONY: all load delete listvariants docker docker-load
+.PHONY: all load delete listvariants
