@@ -83,9 +83,11 @@ RUN apk del python_build_deps
 # Download SDKs for all models
 # ----------------------------
 
-ARG NANOS_SDK_TAG=v2.1.0-14
+# https://github.com/LedgerHQ/nanos-secure-sdk
+ARG NANOS_SDK_TAG=v2.1.0-19
 ARG NANOX_SDK_TAG=v5.8.0
-ARG NANOSP_SDK_TAG=v1.10.1
+# https://github.com/LedgerHQ/ledger-secure-sdk
+ARG NANOSP_SDK_TAG="nanos+_1.1.2"
 
 # Work around the git security to be able to get informations from repositories
 # even if the container is not run with root UID/GID
